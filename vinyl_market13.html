@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pound of Sound — купить, продать, обменять пластинки</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg:       #0c0b09;
+  --bg2:      #131210;
+  --bg3:      #1a1814;
+  --bg4:      #221f1a;
+  --gold:     #c9a84c;
+  --gold2:    #e8c97a;
+  --gold3:    #f5e4b0;
+  --gold-dim: #7a6430;
+  --text:     #f0ead8;
+  --text2:    #b0a88e;
+  --text3:    #6e6654;
+  --border:   rgba(201,168,76,0.15);
+  --border2:  rgba(201,168,76,0.3);
+  --serif:    'Cormorant Garamond', Georgia, serif;
+  --sans:     'Jost', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+/* NOISE OVERLAY */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 1000; opacity: 1;
+}
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); }
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(12,11,9,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 48px;
+  display: flex; align-items: stretch; height: 60px;
+}
+
+.nav-logo {
+  font-family: var(--serif);
+  font-size: 22px; font-weight: 400;
+  letter-spacing: 0.04em;
+  display: flex; align-items: center; gap: 12px;
+  margin-right: 48px; color: var(--text);
+  text-decoration: none;
+}
+
+.logo-mark {
+  width: 28px; height: 28px;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; flex-shrink: 0;
+}
+.logo-mark::before {
+  content: '';
+  position: absolute; inset: 4px;
+  border: 1px solid var(--gold-dim);
+  border-radius: 50%;
+}
+.logo-mark::after {
+  content: '';
+  width: 5px; height: 5px;
+  background: var(--gold);
+  border-radius: 50%;
+}
+
+.nav-links { display: flex; align-items: stretch; list-style: none; flex: 1; }
+.nav-links a {
+  display: flex; align-items: center;
+  padding: 0 22px;
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 400;
+  text-decoration: none; color: var(--text3);
+  border-right: 1px solid var(--border);
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--gold2); }
+.nav-links a.active { color: var(--gold); }
+
+.nav-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+
+/* BUTTONS */
+.btn {
+  font-family: var(--sans); font-size: 11px;
+  letter-spacing: 0.12em; text-transform: uppercase; font-weight: 400;
+  padding: 9px 22px;
+  border: 1px solid var(--border2);
+  background: transparent; cursor: pointer;
+  color: var(--text2);
+  transition: all 0.2s;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+}
+.btn:hover { border-color: var(--gold); color: var(--gold); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.btn-fill {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--bg);
+  font-weight: 500;
+}
+.btn-fill:hover { background: var(--gold2); border-color: var(--gold2); color: var(--bg); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 92vh;
+  display: flex; align-items: center;
+  padding: 80px 48px;
+  position: relative; overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+
+/* RECORD ANIMATION */
+.hero-record-wrap {
+  position: absolute;
+  right: -40px; top: 50%;
+  transform: translateY(-50%);
+  width: 640px; height: 640px;
+  pointer-events: none;
+}
+
+.hero-record {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  position: relative;
+  animation: heroSpin 18s linear infinite;
+}
+
+@keyframes heroSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.hero-record-disc {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  background: #0f0e0c;
+  box-shadow: 0 0 120px rgba(0,0,0,0.8), inset 0 0 60px rgba(0,0,0,0.5);
+}
+
+/* Vinyl grooves */
+.hero-record-grooves {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  background: repeating-radial-gradient(
+    circle at 50%,
+    transparent 40px,
+    rgba(201,168,76,0.04) 41px,
+    transparent 42px,
+    transparent 46px,
+    rgba(201,168,76,0.03) 47px,
+    transparent 48px
+  );
+}
+
+/* Sheen */
+.hero-record-sheen {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(201,168,76,0.06) 30deg,
+    transparent 60deg,
+    rgba(255,255,255,0.03) 120deg,
+    transparent 150deg,
+    rgba(201,168,76,0.04) 210deg,
+    transparent 240deg,
+    rgba(255,255,255,0.02) 300deg,
+    transparent 360deg
+  );
+}
+
+/* Label */
+.hero-record-label {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #2a2318, #1a1510);
+  border: 1px solid rgba(201,168,76,0.2);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 4px;
+}
+.hero-record-label::after {
+  content: '';
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 14px; height: 14px;
+  background: #0c0b09;
+  border-radius: 50%;
+  border: 1px solid rgba(201,168,76,0.3);
+}
+.label-title {
+  font-family: var(--serif); font-size: 13px; font-weight: 400;
+  color: var(--gold2); letter-spacing: 0.08em; text-align: center;
+  line-height: 1.2;
+}
+.label-sub {
+  font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--gold-dim);
+}
+
+/* Tonearm */
+.hero-tonearm {
+  position: absolute;
+  top: 8%; right: 30%;
+  width: 160px; height: 3px;
+  transform-origin: right center;
+  transform: rotate(-28deg);
+}
+.tonearm-body {
+  position: absolute; inset: 0;
+  background: linear-gradient(to right, transparent, var(--gold-dim), var(--text3));
+  border-radius: 2px;
+}
+.tonearm-head {
+  position: absolute; left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 10px; height: 10px;
+  background: var(--gold-dim);
+  border-radius: 2px;
+}
+
+/* Glow behind record */
+.hero-record-wrap::before {
+  content: '';
+  position: absolute; inset: 10%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%);
+}
+
+/* HERO CONTENT */
+.hero-content { position: relative; z-index: 2; max-width: 540px; }
+
+.hero-eyebrow {
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 14px;
+  animation: fadeUp 0.8s ease both 0.1s;
+}
+.hero-eyebrow::before {
+  content: ''; display: inline-block;
+  width: 32px; height: 1px; background: var(--gold);
+}
+
+.hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(52px, 6vw, 88px);
+  font-weight: 300; line-height: 0.95;
+  letter-spacing: -0.01em; margin-bottom: 28px;
+  animation: fadeUp 0.8s ease both 0.2s;
+}
+.hero h1 em { font-style: italic; color: var(--gold2); }
+
+.hero-sub {
+  color: var(--text2); font-size: 14px; line-height: 1.75;
+  max-width: 400px; margin-bottom: 44px;
+  animation: fadeUp 0.8s ease both 0.3s;
+}
+
+.hero-actions {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  animation: fadeUp 0.8s ease both 0.4s;
+}
+
+.hero-divider {
+  width: 1px; height: 60px; background: var(--border2);
+  margin: 0 4px; align-self: center;
+}
+
+.hero-stats {
+  display: flex; gap: 44px; margin-top: 64px; padding-top: 36px;
+  border-top: 1px solid var(--border);
+  animation: fadeUp 0.8s ease both 0.5s;
+}
+.stat-num {
+  font-family: var(--serif); font-size: 36px; font-weight: 300;
+  color: var(--gold2); line-height: 1;
+}
+.stat-label {
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text3); margin-top: 5px;
+}
+
+/* ── FILTERS ── */
+.filters-bar {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 48px;
+  display: flex; align-items: stretch; height: 50px;
+  overflow-x: auto;
+}
+.filter-chip {
+  font-family: var(--sans); font-size: 11px;
+  letter-spacing: 0.12em; text-transform: uppercase; font-weight: 400;
+  padding: 0 22px; border: none;
+  border-right: 1px solid var(--border);
+  background: transparent; cursor: pointer;
+  color: var(--text3); white-space: nowrap;
+  transition: color 0.2s, background 0.2s;
+  display: flex; align-items: center; gap: 7px;
+}
+.filter-chip:hover { color: var(--gold2); background: rgba(201,168,76,0.04); }
+.filter-chip.active { color: var(--gold); background: rgba(201,168,76,0.06); }
+
+.search-wrap {
+  margin-left: auto; display: flex; align-items: center;
+  border-left: 1px solid var(--border); padding: 0 18px; gap: 10px;
+}
+.search-wrap input {
+  border: none; background: transparent;
+  font-family: var(--sans); font-weight: 300; font-size: 12px;
+  color: var(--text); width: 220px; outline: none;
+}
+.search-wrap input::placeholder { color: var(--text3); }
+
+/* ── CATALOG ── */
+.catalog-section { padding: 56px 48px; }
+.section-header {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 36px; padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+.section-title {
+  font-family: var(--serif); font-size: 32px; font-weight: 300;
+  letter-spacing: 0.02em; color: var(--text);
+}
+.section-meta { font-size: 11px; color: var(--text3); letter-spacing: 0.1em; }
+
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1px;
+  border: 1px solid var(--border);
+}
+
+.empty-state {
+  grid-column: 1/-1; padding: 80px 40px;
+  text-align: center; color: var(--text3);
+}
+.empty-state-icon {
+  font-family: var(--serif); font-size: 48px;
+  color: var(--gold-dim); margin-bottom: 16px; opacity: 0.4;
+}
+
+/* ── VINYL CARD ── */
+.vinyl-card {
+  background: var(--bg2); cursor: pointer;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+  position: relative; display: flex; flex-direction: column;
+  animation: fadeUp 0.5s ease both;
+}
+.vinyl-card:hover { background: var(--bg3); }
+.vinyl-card:hover .card-record { transform: rotate(10deg) scale(1.06); }
+.vinyl-card:hover .card-overlay { opacity: 1; }
+
+.card-visual {
+  height: 230px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; background: var(--bg3); position: relative;
+}
+
+.card-overlay {
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(201,168,76,0.06), transparent 70%);
+  opacity: 0; transition: opacity 0.3s;
+}
+
+.card-record {
+  width: 155px; height: 155px; border-radius: 50%;
+  background: #0f0e0c;
+  position: relative;
+  transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  flex-shrink: 0;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+}
+.card-record::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: repeating-radial-gradient(circle at 50%, transparent 22px, rgba(201,168,76,0.04) 23px, transparent 24px);
+}
+.card-record::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--bg); border: 1px solid var(--gold-dim);
+}
+
+.card-badge {
+  position: absolute; top: 14px; left: 14px;
+  font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 3px 10px;
+  background: var(--gold); color: var(--bg); font-weight: 500;
+}
+.card-condition {
+  position: absolute; top: 14px; right: 14px;
+  font-size: 9px; letter-spacing: 0.08em;
+  padding: 3px 9px; border: 1px solid var(--border2);
+  color: var(--gold2); background: rgba(12,11,9,0.7);
+}
+
+.card-body { padding: 18px 18px 14px; flex: 1; }
+.card-genre {
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--gold-dim); margin-bottom: 7px;
+}
+.card-artist { font-family: var(--serif); font-size: 19px; font-weight: 400; line-height: 1.2; color: var(--text); }
+.card-title { color: var(--text2); font-size: 12px; margin-top: 3px; font-weight: 300; }
+.card-year { font-size: 11px; color: var(--text3); margin-top: 5px; }
+
+.card-footer {
+  padding: 13px 18px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-price { font-family: var(--serif); font-size: 22px; font-weight: 300; color: var(--gold2); }
+.card-price-label { font-size: 10px; color: var(--text3); letter-spacing: 0.05em; }
+.card-type {
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text3); display: flex; align-items: center; gap: 5px;
+}
+.type-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold-dim); }
+
+/* ── LISTING OVERLAY ── */
+.overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(8,7,6,0.85);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+
+.listing-panel {
+  background: var(--bg2); border: 1px solid var(--border2);
+  width: 100%; max-width: 840px; max-height: 90vh; overflow-y: auto;
+  transform: translateY(24px); transition: transform 0.3s;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.8);
+}
+.overlay.open .listing-panel { transform: translateY(0); }
+
+.listing-header {
+  padding: 0 36px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px; position: sticky; top: 0;
+  background: var(--bg2); z-index: 10;
+}
+.listing-header-title {
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text3);
+}
+.close-btn {
+  border: none; background: none; cursor: pointer;
+  font-size: 22px; color: var(--text3); line-height: 1; padding: 4px;
+  transition: color 0.2s;
+}
+.close-btn:hover { color: var(--gold); }
+
+.listing-body { display: grid; grid-template-columns: 1fr 1fr; }
+
+.listing-visual {
+  border-right: 1px solid var(--border);
+  padding: 52px 36px;
+  display: flex; flex-direction: column; align-items: center; gap: 28px;
+}
+
+.listing-record {
+  width: 230px; height: 230px; border-radius: 50%;
+  background: #0f0e0c;
+  position: relative; flex-shrink: 0;
+  animation: spinRecord 10s linear infinite;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.7), 0 0 60px rgba(201,168,76,0.05);
+}
+@keyframes spinRecord { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+.listing-record::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: repeating-radial-gradient(circle at 50%, transparent 30px, rgba(201,168,76,0.04) 31px, transparent 32px);
+}
+.listing-record::after {
+  content: ''; position: absolute; top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:60px;height:60px;border-radius:50%;
+  background:var(--bg);border:1px solid var(--gold-dim);
+}
+
+.listing-specs { width: 100%; border: 1px solid var(--border); }
+.spec-row { display: flex; border-bottom: 1px solid var(--border); }
+.spec-row:last-child { border-bottom: none; }
+.spec-key {
+  padding: 9px 14px; width: 115px; flex-shrink: 0;
+  color: var(--text3); border-right: 1px solid var(--border);
+  font-size: 11px; letter-spacing: 0.06em;
+}
+.spec-val { padding: 9px 14px; font-size: 12px; color: var(--text2); }
+
+.listing-info { padding: 44px 36px; }
+.listing-genre {
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--gold-dim); margin-bottom: 10px;
+}
+.listing-artist { font-family: var(--serif); font-size: 36px; font-weight: 300; line-height: 1.05; color: var(--text); }
+.listing-album { font-size: 15px; color: var(--text2); margin-top: 5px; font-weight: 300; }
+
+.listing-price-block {
+  margin: 28px 0; padding: 22px 0;
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+}
+.listing-price { font-family: var(--serif); font-size: 44px; font-weight: 300; color: var(--gold2); }
+.listing-price-sub { font-size: 11px; color: var(--text3); margin-top: 5px; letter-spacing: 0.08em; }
+
+.listing-desc { font-size: 13px; line-height: 1.75; color: var(--text2); margin-bottom: 24px; font-weight: 300; }
+.listing-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+.listing-tag {
+  font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 4px 12px; border: 1px solid var(--border2); color: var(--gold-dim);
+}
+.listing-actions { display: flex; flex-direction: column; gap: 10px; }
+.listing-actions .btn { justify-content: center; width: 100%; padding: 14px; font-size: 11px; }
+
+.seller-block {
+  padding: 16px 18px; border: 1px solid var(--border);
+  margin-top: 20px; display: flex; align-items: center; gap: 14px;
+}
+.seller-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--bg4); border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: var(--gold); font-weight: 400; flex-shrink: 0;
+}
+.seller-name { font-size: 13px; color: var(--text); }
+.seller-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+/* ── AUTH OVERLAY ── */
+.auth-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(8,7,6,0.88); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.auth-overlay.open { opacity: 1; pointer-events: all; }
+.auth-panel {
+  background: var(--bg2); border: 1px solid var(--border2);
+  width: 100%; max-width: 420px;
+  transform: translateY(24px); transition: transform 0.3s;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.8);
+}
+.auth-overlay.open .auth-panel { transform: translateY(0); }
+.auth-header {
+  padding: 0 28px; height: 56px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.auth-title { font-family: var(--serif); font-size: 22px; font-weight: 300; color: var(--text); }
+.auth-body { padding: 28px; }
+.auth-tabs { display: flex; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
+.auth-tab {
+  flex: 1; padding: 10px; background: none; border: none; cursor: pointer;
+  font-family: var(--sans); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  font-weight: 400; color: var(--text3);
+  border-bottom: 1px solid transparent; margin-bottom: -1px; transition: color 0.2s, border-color 0.2s;
+}
+.auth-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+.auth-error {
+  font-size: 12px; color: #c0392b; padding: 10px 14px;
+  border: 1px solid rgba(192,57,43,0.4); margin-bottom: 16px;
+  background: rgba(192,57,43,0.08); display: none;
+}
+.auth-success {
+  font-size: 12px; color: var(--gold2); padding: 10px 14px;
+  border: 1px solid var(--border2); margin-bottom: 16px;
+  background: rgba(201,168,76,0.08); display: none;
+}
+
+/* ── ADD LISTING ── */
+.add-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(8,7,6,0.88); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.add-overlay.open { opacity: 1; pointer-events: all; }
+.add-panel {
+  background: var(--bg2); border: 1px solid var(--border2);
+  width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto;
+  transform: translateY(24px); transition: transform 0.3s;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.8);
+}
+.add-overlay.open .add-panel { transform: translateY(0); }
+.add-header {
+  padding: 0 28px; height: 56px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; background: var(--bg2); z-index: 10;
+}
+.add-title { font-family: var(--serif); font-size: 22px; font-weight: 300; color: var(--text); }
+.add-body { padding: 28px; }
+
+/* FORMS */
+.form-group { margin-bottom: 20px; }
+.form-label {
+  display: block; font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text3); margin-bottom: 8px;
+}
+.form-input, .form-select, .form-textarea {
+  width: 100%; font-family: var(--sans); font-size: 13px; font-weight: 300;
+  border: 1px solid var(--border2); background: var(--bg);
+  padding: 11px 14px; color: var(--text); outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--gold); }
+.form-input::placeholder, .form-textarea::placeholder { color: var(--text3); }
+.form-select option { background: var(--bg2); }
+.form-textarea { resize: vertical; min-height: 80px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.type-toggle { display: flex; }
+.type-btn {
+  flex: 1; font-family: var(--sans); font-size: 11px;
+  letter-spacing: 0.1em; text-transform: uppercase; font-weight: 400;
+  padding: 10px; border: 1px solid var(--border2);
+  background: transparent; cursor: pointer; color: var(--text3);
+  transition: all 0.2s; margin-right: -1px;
+}
+.type-btn:hover { color: var(--gold2); border-color: var(--border2); }
+.type-btn.active { background: rgba(201,168,76,0.12); color: var(--gold); border-color: var(--gold); z-index: 1; }
+
+/* UPLOAD ZONE */
+.upload-zone {
+  border: 1px dashed var(--border2); padding: 28px;
+  text-align: center; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.upload-zone:hover { border-color: var(--gold); background: rgba(201,168,76,0.04); }
+.upload-icon { font-family: var(--serif); font-size: 32px; color: var(--gold-dim); margin-bottom: 8px; opacity: 0.5; }
+.upload-text { color: var(--text3); font-size: 12px; letter-spacing: 0.06em; }
+
+/* ── EXPERT ── */
+.expert-section {
+  border-top: 1px solid var(--border);
+  padding: 72px 48px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center;
+  position: relative; overflow: hidden;
+}
+.expert-section::before {
+  content: '';
+  position: absolute; right: -100px; top: -100px;
+  width: 400px; height: 400px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,168,76,0.04), transparent 70%);
+  pointer-events: none;
+}
+.expert-eyebrow {
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 18px;
+  display: flex; align-items: center; gap: 14px;
+}
+.expert-eyebrow::before { content: ''; display: inline-block; width: 28px; height: 1px; background: var(--gold); }
+.expert-h { font-family: var(--serif); font-size: 42px; font-weight: 300; line-height: 1.05; letter-spacing: 0.01em; margin-bottom: 18px; }
+.expert-h em { font-style: italic; color: var(--gold2); }
+.expert-body { font-size: 13px; color: var(--text2); line-height: 1.75; margin-bottom: 32px; font-weight: 300; }
+.expert-right { border: 1px solid var(--border); padding: 32px; display: flex; flex-direction: column; gap: 20px; }
+.expert-item { display: flex; gap: 18px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+.expert-item:last-child { border-bottom: none; padding-bottom: 0; }
+.expert-num { font-family: var(--serif); font-size: 30px; font-weight: 300; color: var(--gold-dim); line-height: 1; min-width: 36px; }
+.expert-item-title { font-size: 13px; color: var(--text); margin-bottom: 4px; }
+.expert-item-desc { font-size: 12px; color: var(--text3); line-height: 1.6; font-weight: 300; }
+
+/* FOOTER */
+footer {
+  border-top: 1px solid var(--border); padding: 32px 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 11px; color: var(--text3); letter-spacing: 0.06em;
+}
+.footer-logo { font-family: var(--serif); font-size: 18px; font-weight: 300; color: var(--text2); }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 36px; left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: var(--bg3); border: 1px solid var(--border2);
+  color: var(--gold2); font-size: 12px; padding: 13px 28px;
+  opacity: 0; transition: opacity 0.25s, transform 0.25s;
+  pointer-events: none; z-index: 500; letter-spacing: 0.06em;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  nav, .hero, .catalog-section, .expert-section, footer { padding-left: 20px; padding-right: 20px; }
+  .hero { min-height: auto; padding: 60px 20px 48px; }
+  .hero-record-wrap { display: none; }
+  .hero-stats { gap: 28px; flex-wrap: wrap; }
+  .listing-body, .expert-section { grid-template-columns: 1fr; }
+  .listing-visual { border-right: none; border-bottom: 1px solid var(--border); }
+  .form-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="logo-mark"></div>
+    Pound of Sound
+  </div>
+  <ul class="nav-links">
+    <li><a href="#catalog" class="active">Каталог</a></li>
+    <li><a href="#expert-section">Оценка</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="btn" id="nav-add-btn" onclick="handleAddClick()">+ Объявление</button>
+    <button class="btn btn-fill" id="nav-auth-btn" onclick="openAuth()">Войти</button>
+    <div id="nav-user" style="display:none;align-items:center;gap:12px">
+      <span id="nav-username" style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold-dim)"></span>
+      <button class="btn" id="logout-btn" onclick="handleLogout()">Выйти</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <!-- Animated vinyl record -->
+  <div class="hero-record-wrap">
+    <div class="hero-record">
+      <div class="hero-record-disc"></div>
+      <div class="hero-record-grooves"></div>
+      <div class="hero-record-sheen"></div>
+      <div class="hero-record-label">
+        <div class="label-title">Pound<br>of Sound</div>
+        <div class="label-sub">33⅓ RPM</div>
+      </div>
+    </div>
+    <div class="hero-tonearm"><div class="tonearm-body"></div><div class="tonearm-head"></div></div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">Маркетплейс виниловых пластинок</div>
+    <h1>Найди<br><em>редкий</em><br>винил.</h1>
+    <p class="hero-sub">Покупай, продавай и обменивай пластинки с коллекционерами по всей стране. Экспертная оценка состояния и подлинности.</p>
+    <div class="hero-actions">
+      <button class="btn btn-fill" onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">Смотреть каталог</button>
+      <button class="btn" onclick="handleAddClick()">Продать пластинку</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num" id="stat-listings">—</div>
+        <div class="stat-label">Пластинок</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="stat-item">
+        <div class="stat-num" id="stat-users">—</div>
+        <div class="stat-label">Продавцов</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FILTERS -->
+<div class="filters-bar" id="catalog">
+  <button class="filter-chip active" onclick="filterCat('all',this)">Все</button>
+  <button class="filter-chip" onclick="filterCat('Джаз',this)">Джаз</button>
+  <button class="filter-chip" onclick="filterCat('Рок',this)">Рок</button>
+  <button class="filter-chip" onclick="filterCat('Классика',this)">Классика</button>
+  <button class="filter-chip" onclick="filterCat('Электроника',this)">Электроника</button>
+  <button class="filter-chip" onclick="filterCat('exchange',this)">Только обмен</button>
+  <div class="search-wrap">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="#6e6654" stroke-width="1"/><line x1="9.5" y1="9.5" x2="13" y2="13" stroke="#6e6654" stroke-width="1.2" stroke-linecap="round"/></svg>
+    <input type="text" placeholder="Исполнитель, альбом, лейбл..." oninput="searchCards(this.value)">
+  </div>
+</div>
+
+<!-- CATALOG -->
+<section class="catalog-section">
+  <div class="section-header">
+    <h2 class="section-title">Свежие объявления</h2>
+    <span class="section-meta" id="catalog-count">Загрузка...</span>
+  </div>
+  <div class="catalog-grid" id="catalog-grid">
+    <div class="empty-state"><div class="empty-state-icon">◎</div><div>Загрузка...</div></div>
+  </div>
+</section>
+
+<!-- EXPERT -->
+<section class="expert-section" id="expert-section">
+  <div>
+    <div class="expert-eyebrow">Для коллекционеров</div>
+    <h2 class="expert-h">Экспертная<br><em>оценка</em><br>пластинок</h2>
+    <p class="expert-body">Наши эксперты оценят состояние, подлинность и рыночную стоимость вашей пластинки по стандарту Goldmine. Результат — в течение 48 часов.</p>
+    <button class="btn btn-fill" style="padding:14px 32px">Заказать оценку</button>
+  </div>
+  <div class="expert-right">
+    <div class="expert-item"><div class="expert-num">01</div><div><div class="expert-item-title">Состояние по Goldmine</div><div class="expert-item-desc">M, NM, VG+, VG, G+ — точная классификация царапин, шипения, конверта</div></div></div>
+    <div class="expert-item"><div class="expert-num">02</div><div><div class="expert-item-title">Проверка подлинности</div><div class="expert-item-desc">Оригинальный пресс, матричные номера, страна выпуска</div></div></div>
+    <div class="expert-item"><div class="expert-num">03</div><div><div class="expert-item-title">Рыночная оценка</div><div class="expert-item-desc">Актуальная цена по данным Discogs и последних аукционов</div></div></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">Pound of Sound</div>
+  <div>© 2025 — MVP. Учебный проект «Управление продуктом»</div>
+  <div>О проекте · Правила · Помощь</div>
+</footer>
+
+<!-- LISTING OVERLAY -->
+<div class="overlay" id="listing-overlay" onclick="closeListing(event)">
+  <div class="listing-panel">
+    <div class="listing-header">
+      <span class="listing-header-title">Объявление</span>
+      <button class="close-btn" onclick="closeListing(null)">&times;</button>
+    </div>
+    <div class="listing-body">
+      <div class="listing-visual">
+        <div class="listing-record"></div>
+        <table class="listing-specs" id="listing-specs"></table>
+      </div>
+      <div class="listing-info" id="listing-info"></div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH OVERLAY -->
+<div class="auth-overlay" id="auth-overlay" onclick="closeAuthOverlay(event)">
+  <div class="auth-panel">
+    <div class="auth-header">
+      <div class="auth-title">Аккаунт</div>
+      <button class="close-btn" onclick="closeAuthOverlay(null)">&times;</button>
+    </div>
+    <div class="auth-body">
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login',this)">Вход</button>
+        <button class="auth-tab" onclick="switchAuthTab('register',this)">Регистрация</button>
+      </div>
+      <div class="auth-error" id="auth-error"></div>
+      <div class="auth-success" id="auth-success"></div>
+      <div id="login-form">
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="login-email" placeholder="you@example.com"></div>
+        <div class="form-group"><label class="form-label">Пароль</label><input class="form-input" type="password" id="login-password" placeholder="••••••••"></div>
+        <button class="btn btn-fill" style="width:100%;padding:14px;justify-content:center" onclick="handleLogin()">Войти</button>
+      </div>
+      <div id="register-form" style="display:none">
+        <div class="form-group"><label class="form-label">Имя пользователя</label><input class="form-input" type="text" id="reg-username" placeholder="vinyl_collector"></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="reg-email" placeholder="you@example.com"></div>
+        <div class="form-group"><label class="form-label">Пароль</label><input class="form-input" type="password" id="reg-password" placeholder="Минимум 6 символов"></div>
+        <button class="btn btn-fill" style="width:100%;padding:14px;justify-content:center" onclick="handleRegister()">Зарегистрироваться</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD LISTING OVERLAY -->
+<div class="add-overlay" id="add-overlay" onclick="closeAdd(event)">
+  <div class="add-panel">
+    <div class="add-header">
+      <div class="add-title">Новое объявление</div>
+      <button class="close-btn" onclick="closeAdd(null)">&times;</button>
+    </div>
+    <div class="add-body">
+      <div class="form-group">
+        <label class="form-label">Тип объявления</label>
+        <div class="type-toggle">
+          <button class="type-btn active" onclick="setType(this,'sell')">Продажа</button>
+          <button class="type-btn" onclick="setType(this,'exchange')">Обмен</button>
+          <button class="type-btn" onclick="setType(this,'both')">Оба</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Исполнитель</label><input class="form-input" type="text" id="f-artist" placeholder="Miles Davis"></div>
+        <div class="form-group"><label class="form-label">Альбом</label><input class="form-input" type="text" id="f-album" placeholder="Kind of Blue"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Год выпуска</label><input class="form-input" type="text" id="f-year" placeholder="1959"></div>
+        <div class="form-group"><label class="form-label">Лейбл</label><input class="form-input" type="text" id="f-label" placeholder="Columbia"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Жанр</label>
+          <select class="form-select" id="f-genre">
+            <option>Джаз</option><option>Рок</option><option>Классика</option><option>Электроника</option><option>Поп</option><option>Другое</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Состояние</label>
+          <select class="form-select" id="f-condition">
+            <option>M</option><option>NM</option><option>VG+</option><option>VG</option><option>G+</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" id="price-group"><label class="form-label">Цена (₽)</label><input class="form-input" type="number" id="f-price" placeholder="3500"></div>
+      <div class="form-group"><label class="form-label">Описание</label><textarea class="form-textarea" id="f-desc" placeholder="Оригинальный пресс, куплен в Японии..."></textarea></div>
+      <div class="form-group">
+        <label class="form-label">Фото пластинки</label>
+        <div class="upload-zone" onclick="document.getElementById('f-photo').click()">
+          <div id="upload-placeholder">
+            <div class="upload-icon">◎</div>
+            <div class="upload-text">Нажми чтобы выбрать фото</div>
+          </div>
+          <img id="upload-preview" style="display:none;max-width:100%;max-height:200px;object-fit:contain;" alt="preview">
+        </div>
+        <input type="file" id="f-photo" accept="image/*" style="display:none" onchange="previewPhoto(this)">
+      </div>
+      <button class="btn btn-fill" id="submit-btn" style="width:100%;padding:14px;justify-content:center" onclick="submitListing()">Опубликовать объявление</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://vqtbevkgjmdxbjjilkzg.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxdGJldmtnam1keGJqamlsa3pnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MzU2MzgsImV4cCI6MjA5NTUxMTYzOH0.WzAfxS2-JGvvEJI-aG5NO_xjrH23PL5W2rh_wA0c4Bw';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
+let allListings = [];
+let currentFilter = 'all';
+let currentSearch = '';
+let currentType = 'sell';
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg; el.style.display = 'block';
+  document.getElementById('auth-success').style.display = 'none';
+}
+
+function showAuthSuccess(msg) {
+  const el = document.getElementById('auth-success');
+  el.textContent = msg; el.style.display = 'block';
+  document.getElementById('auth-error').style.display = 'none';
+}
+
+function openAuth() {
+  document.getElementById('auth-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAuthOverlay(e) {
+  if (e && e.target !== document.getElementById('auth-overlay')) return;
+  document.getElementById('auth-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('auth-error').style.display = 'none';
+  document.getElementById('auth-success').style.display = 'none';
+}
+
+function switchAuthTab(tab, btn) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('login-form').style.display = tab === 'login' ? '' : 'none';
+  document.getElementById('register-form').style.display = tab === 'register' ? '' : 'none';
+  document.getElementById('auth-error').style.display = 'none';
+  document.getElementById('auth-success').style.display = 'none';
+}
+
+function handleAddClick() {
+  if (!currentUser) { openAuth(); showToast('Войдите, чтобы подать объявление'); return; }
+  document.getElementById('add-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAdd(e) {
+  if (e && e.target !== document.getElementById('add-overlay')) return;
+  document.getElementById('add-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeListing(e) {
+  if (e && e.target !== document.getElementById('listing-overlay')) return;
+  document.getElementById('listing-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function setType(btn, type) {
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentType = type;
+  document.getElementById('price-group').style.display = type === 'exchange' ? 'none' : 'block';
+}
+
+function filterCat(cat, btn) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = cat;
+  renderCards(getFiltered());
+}
+
+function searchCards(q) {
+  currentSearch = q;
+  renderCards(getFiltered());
+}
+
+function previewPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('upload-preview').src = e.target.result;
+    document.getElementById('upload-preview').style.display = 'block';
+    document.getElementById('upload-placeholder').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function getFiltered() {
+  return allListings.filter(r => {
+    if (currentFilter === 'exchange') return r.type === 'exchange' || r.type === 'both';
+    if (currentFilter !== 'all' && r.genre !== currentFilter) return false;
+    if (currentSearch) {
+      const s = currentSearch.toLowerCase();
+      return r.artist.toLowerCase().includes(s) || r.album.toLowerCase().includes(s) || (r.label || '').toLowerCase().includes(s);
+    }
+    return true;
+  });
+}
+
+const RECORD_COLORS = ['#1a1a1a','#0f0f1a','#1a0f0a','#0a1a0a','#0a0a1a','#1a1510'];
+
+function renderCards(list) {
+  const grid = document.getElementById('catalog-grid');
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">◎</div><div>Объявлений пока нет. Будьте первым!</div></div>';
+    return;
+  }
+  grid.innerHTML = list.map((r, i) => {
+    const typeLabel = r.type === 'sell' ? 'Продажа' : r.type === 'exchange' ? 'Обмен' : 'Прод/Обмен';
+    const priceStr = r.price > 0 ? Number(r.price).toLocaleString('ru-RU') + ' ₽' : 'Обмен';
+    const color = RECORD_COLORS[i % RECORD_COLORS.length];
+    const visualContent = r.image_url
+      ? '<img src="' + r.image_url + '" style="width:100%;height:100%;object-fit:cover;" alt="' + r.artist + '">'
+      : '<div class="card-record" style="background:' + color + '"></div><div class="card-overlay"></div>';
+    return '<div class="vinyl-card" style="animation-delay:' + (i*0.06) + 's" onclick="openListing(\'' + r.id + '\')">'
+      + '<div class="card-visual">' + visualContent
+      + '<span class="card-badge">' + typeLabel + '</span>'
+      + '<span class="card-condition">' + r.condition + '</span></div>'
+      + '<div class="card-body">'
+      + '<div class="card-genre">' + (r.genre || '') + '</div>'
+      + '<div class="card-artist">' + r.artist + '</div>'
+      + '<div class="card-title">' + r.album + '</div>'
+      + '<div class="card-year">' + (r.year || '') + ' · ' + (r.label || '') + '</div></div>'
+      + '<div class="card-footer">'
+      + '<div><div class="card-price">' + priceStr + '</div>' + (r.price > 0 ? '<div class="card-price-label">фиксированная</div>' : '') + '</div>'
+      + '<div class="card-type"><span class="type-dot"></span>' + (r.type === 'sell' ? 'Купить' : r.type === 'exchange' ? 'Обменять' : 'Купить/Обм.') + '</div>'
+      + '</div></div>';
+  }).join('');
+}
+
+function openListing(id) {
+  const r = allListings.find(x => x.id === id);
+  if (!r) return;
+  const priceStr = r.price > 0 ? Number(r.price).toLocaleString('ru-RU') + ' ₽' : 'Обмен';
+  const recordVisual = document.querySelector('.listing-record');
+  if (r.image_url) {
+    recordVisual.style.cssText = 'width:220px;height:220px;border-radius:8px;overflow:hidden;animation:none;flex-shrink:0;';
+    recordVisual.innerHTML = '<img src="' + r.image_url + '" style="width:100%;height:100%;object-fit:cover;" alt="' + r.artist + '">';
+  } else {
+    recordVisual.style.cssText = '';
+    recordVisual.innerHTML = '';
+  }
+  document.getElementById('listing-specs').innerHTML =
+    '<tr class="spec-row"><td class="spec-key">Жанр</td><td class="spec-val">' + (r.genre || '—') + '</td></tr>'
+    + '<tr class="spec-row"><td class="spec-key">Лейбл</td><td class="spec-val">' + (r.label || '—') + '</td></tr>'
+    + '<tr class="spec-row"><td class="spec-key">Год</td><td class="spec-val">' + (r.year || '—') + '</td></tr>'
+    + '<tr class="spec-row"><td class="spec-key">Состояние</td><td class="spec-val">' + r.condition + '</td></tr>'
+    + '<tr class="spec-row"><td class="spec-key">Тип</td><td class="spec-val">' + (r.type === 'sell' ? 'Продажа' : r.type === 'exchange' ? 'Обмен' : 'Прод/Обмен') + '</td></tr>';
+  const isSell = r.type === 'sell' || r.type === 'both';
+  const isExch = r.type === 'exchange' || r.type === 'both';
+  const seller = (r.profiles && r.profiles.username) ? r.profiles.username : 'Пользователь';
+  const initials = seller.slice(0,2).toUpperCase();
+  document.getElementById('listing-info').innerHTML =
+    '<div class="listing-genre">' + (r.genre || '') + '</div>'
+    + '<div class="listing-artist">' + r.artist + '</div>'
+    + '<div class="listing-album">' + r.album + '</div>'
+    + '<div class="listing-price-block"><div class="listing-price">' + priceStr + '</div>'
+    + '<div class="listing-price-sub">' + (r.type === 'exchange' ? 'только обмен' : 'фиксированная цена') + '</div></div>'
+    + '<div class="listing-desc">' + (r.description || 'Описание не указано.') + '</div>'
+    + '<div class="listing-tags"><span class="listing-tag">' + r.condition + '</span>'
+    + (r.genre ? '<span class="listing-tag">' + r.genre + '</span>' : '') + '</div>'
+    + '<div class="listing-actions">'
+    + (isSell ? '<button class="btn btn-fill">Купить за ' + priceStr + '</button>' : '')
+    + (isExch ? '<button class="btn">Предложить обмен</button>' : '')
+    + '</div>'
+    + '<div class="seller-block"><div class="seller-avatar">' + initials + '</div>'
+    + '<div><div class="seller-name">' + seller + '</div><div class="seller-meta">Продавец</div></div></div>';
+  document.getElementById('listing-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+async function updateNavAuth() {
+  const authBtn = document.getElementById('nav-auth-btn');
+  const userBlock = document.getElementById('nav-user');
+  const usernameEl = document.getElementById('nav-username');
+  const addBtn = document.getElementById('nav-add-btn');
+  const logoutBtn = document.getElementById('logout-btn');
+  if (currentUser) {
+    authBtn.style.display = 'none';
+    userBlock.style.display = 'flex';
+    if (logoutBtn) logoutBtn.onclick = handleLogout;
+    if (addBtn) addBtn.onclick = function() {
+      document.getElementById('add-overlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    };
+    const { data } = await db.from('profiles').select('username').eq('id', currentUser.id).single();
+    usernameEl.textContent = (data && data.username) ? data.username : currentUser.email.split('@')[0];
+  } else {
+    authBtn.style.display = '';
+    userBlock.style.display = 'none';
+    if (addBtn) addBtn.onclick = handleAddClick;
+  }
+}
+
+async function loadListings() {
+  const { data, error } = await db.from('listings').select('*, profiles(username)').order('created_at', { ascending: false });
+  if (error) { console.error(error); return; }
+  allListings = data || [];
+  renderCards(getFiltered());
+  document.getElementById('catalog-count').textContent = allListings.length + ' объявлений';
+}
+
+async function loadStats() {
+  const { count: lCount } = await db.from('listings').select('*', { count: 'exact', head: true });
+  const { count: uCount } = await db.from('profiles').select('*', { count: 'exact', head: true });
+  document.getElementById('stat-listings').textContent = (lCount || 0).toLocaleString('ru-RU');
+  document.getElementById('stat-users').textContent = (uCount || 0).toLocaleString('ru-RU');
+}
+
+async function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) { showAuthError('Заполните все поля'); return; }
+  const { error } = await db.auth.signInWithPassword({ email, password });
+  if (error) { showAuthError('Неверный email или пароль'); return; }
+}
+
+async function handleRegister() {
+  const username = document.getElementById('reg-username').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  if (!username || !email || !password) { showAuthError('Заполните все поля'); return; }
+  if (password.length < 6) { showAuthError('Пароль — минимум 6 символов'); return; }
+  const { data, error } = await db.auth.signUp({ email, password });
+  if (error) { showAuthError(error.message); return; }
+  if (data.user) {
+    const { error: profileError } = await db.from('profiles').insert({ id: data.user.id, username });
+    if (profileError) { showAuthError('Имя пользователя уже занято'); return; }
+  }
+  showAuthSuccess('Аккаунт создан! Можете войти.');
+}
+
+async function handleLogout() {
+  await db.auth.signOut();
+}
+
+async function submitListing() {
+  if (!currentUser) { showToast('Необходима авторизация'); return; }
+  const artist = document.getElementById('f-artist').value.trim();
+  const album = document.getElementById('f-album').value.trim();
+  if (!artist || !album) { showToast('Укажите исполнителя и альбом'); return; }
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = 'Публикация...';
+  let image_url = null;
+  const photoFile = document.getElementById('f-photo').files[0];
+  if (photoFile) {
+    const ext = photoFile.name.split('.').pop();
+    const filename = currentUser.id + '_' + Date.now() + '.' + ext;
+    const { error: uploadError } = await db.storage.from('vinyl_images').upload(filename, photoFile);
+    if (uploadError) {
+      showToast('Ошибка загрузки фото: ' + uploadError.message);
+      btn.disabled = false; btn.textContent = 'Опубликовать объявление';
+      return;
+    }
+    const { data: urlData } = db.storage.from('vinyl_images').getPublicUrl(filename);
+    image_url = urlData.publicUrl;
+  }
+  const payload = {
+    user_id: currentUser.id,
+    artist: artist,
+    album: album,
+    year: document.getElementById('f-year').value.trim() || null,
+    label: document.getElementById('f-label').value.trim() || null,
+    genre: document.getElementById('f-genre').value,
+    condition: document.getElementById('f-condition').value,
+    price: currentType !== 'exchange' ? (parseInt(document.getElementById('f-price').value) || 0) : 0,
+    type: currentType,
+    description: document.getElementById('f-desc').value.trim() || null,
+    image_url: image_url,
+  };
+  const { error } = await db.from('listings').insert(payload);
+  btn.disabled = false; btn.textContent = 'Опубликовать объявление';
+  if (error) { showToast('Ошибка: ' + error.message); return; }
+  document.getElementById('f-photo').value = '';
+  document.getElementById('upload-preview').style.display = 'none';
+  document.getElementById('upload-placeholder').style.display = 'block';
+  closeAdd(null);
+  showToast('Объявление опубликовано!');
+  await loadListings();
+  await loadStats();
+}
+
+db.auth.onAuthStateChange(async function(event, session) {
+  currentUser = session ? session.user : null;
+  updateNavAuth();
+  if (event === 'SIGNED_IN') {
+    closeAuthOverlay(null);
+    showToast('Добро пожаловать!');
+    await loadStats();
+  }
+  if (event === 'SIGNED_OUT') showToast('Вы вышли из аккаунта');
+});
+
+(async function init() {
+  const { data: { session } } = await db.auth.getSession();
+  currentUser = session ? session.user : null;
+  await updateNavAuth();
+  await loadListings();
+  await loadStats();
+})();
+</script>
+</body>
+</html>
