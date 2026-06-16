@@ -20,10 +20,10 @@ export function Nav({ onAddClick, onAuthClick }: NavProps) {
 
       <ul className={styles.links}>
         <li>
-          <a href="#catalog">Каталог</a>
+          <Link to="/#catalog">Каталог</Link>
         </li>
         <li>
-          <a href="#expert">Оценка</a>
+          <Link to="/appraise">ИИ-оценка</Link>
         </li>
       </ul>
 

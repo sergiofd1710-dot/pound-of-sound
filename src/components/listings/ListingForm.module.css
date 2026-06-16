@@ -20,6 +20,27 @@
   color: #1a0d04;
 }
 
+.priceLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.suggest {
+  background: none;
+  border: none;
+  color: var(--accent2);
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  padding: 0;
+  transition: color 0.2s;
+}
+.suggest:hover {
+  color: var(--accent3);
+}
+
 .uploadZone {
   border: 1px dashed var(--border2);
   border-radius: 6px;

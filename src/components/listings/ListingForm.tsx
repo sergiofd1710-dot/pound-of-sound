@@ -4,6 +4,7 @@ import { Button } from '../common/Button';
 import { useToast } from '../common/Toast';
 import { useCreateListing } from '../../hooks/useListings';
 import { useAuth } from '../../contexts/AuthContext';
+import { demoAppraise } from '../../lib/appraisal';
 import type { Condition, ListingType } from '../../types/database';
 import styles from './ListingForm.module.css';
 
@@ -60,6 +61,26 @@ export function ListingForm({ open, onClose }: ListingFormProps) {
     const reader = new FileReader();
     reader.onload = (e) => setPreview(e.target?.result as string);
     reader.readAsDataURL(file);
+  }
+
+  // Демо-подсказка цены: берёт середину рыночной вилки от оценщика.
+  function suggestPrice() {
+    if (!artist.trim() || !album.trim()) {
+      toast('Сначала укажите исполнителя и альбом');
+      return;
+    }
+    const { price_range } = demoAppraise({
+      artist: artist.trim(),
+      album: album.trim(),
+      year: year.trim() || undefined,
+      label: label.trim() || undefined,
+      condition,
+    });
+    const mid = Math.round((price_range.min + price_range.max) / 2 / 100) * 100;
+    setPrice(String(mid));
+    toast(
+      `Рекомендуемая цена: ${price_range.min.toLocaleString('ru-RU')}–${price_range.max.toLocaleString('ru-RU')} ₽`,
+    );
   }
 
   async function submit() {
@@ -185,7 +206,16 @@ export function ListingForm({ open, onClose }: ListingFormProps) {
 
       {type !== 'exchange' && (
         <div className="form-group">
-          <label className="form-label">Цена (₽)</label>
+          <label className={`form-label ${styles.priceLabel}`}>
+            <span>Цена (₽)</span>
+            <button
+              type="button"
+              className={styles.suggest}
+              onClick={suggestPrice}
+            >
+              ◎ Подсказать цену
+            </button>
+          </label>
           <input
             className="form-input"
             type="number"

@@ -36,15 +36,21 @@
   max-width: 420px;
 }
 
-.soon {
+.cta {
   display: inline-block;
-  font-size: 11px;
-  letter-spacing: 0.1em;
+  font-size: 12px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--accent2);
-  border: 1px solid var(--border2);
-  border-radius: 20px;
-  padding: 8px 18px;
+  font-weight: 500;
+  color: #1a0d04;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 13px 28px;
+  transition: background 0.2s;
+}
+.cta:hover {
+  background: var(--accent2);
 }
 
 .right {

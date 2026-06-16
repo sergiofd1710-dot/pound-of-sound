@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import styles from './ExpertSection.module.css';
 
 const ITEMS = [
@@ -31,11 +32,12 @@ export function ExpertSection() {
           пластинок
         </h2>
         <p className={styles.body}>
-          ИИ и живые эксперты оценят состояние, подлинность и рыночную
-          стоимость вашей пластинки по стандарту Goldmine.
+          ИИ оценит состояние, редкость и рыночную стоимость вашей пластинки по
+          стандарту Goldmine — рыночная вилка и совет за пару секунд.
         </p>
-        {/* Рабочая ИИ-оценка подключается в Фазе 2 (Edge Function). */}
-        <span className={styles.soon}>ИИ-оценка — скоро</span>
+        <Link to="/appraise" className={styles.cta}>
+          Оценить пластинку →
+        </Link>
       </div>
 
       <div className={styles.right}>

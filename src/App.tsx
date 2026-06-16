@@ -5,6 +5,7 @@ import { Footer } from './components/layout/Footer';
 import { AuthModal } from './components/common/AuthModal';
 import { ListingForm } from './components/listings/ListingForm';
 import { HomePage } from './routes/HomePage';
+import { AppraisalPage } from './routes/AppraisalPage';
 import { useAuth } from './contexts/AuthContext';
 import { useToast } from './components/common/Toast';
 
@@ -42,6 +43,7 @@ export default function App() {
               />
             }
           />
+          <Route path="/appraise" element={<AppraisalPage />} />
         </Routes>
       </main>
 
