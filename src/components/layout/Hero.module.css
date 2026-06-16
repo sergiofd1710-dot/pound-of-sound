@@ -1,0 +1,175 @@
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 40px;
+  min-height: 70vh;
+  padding: 60px 48px;
+}
+
+.content {
+  max-width: 520px;
+}
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-dim);
+  margin-bottom: 20px;
+}
+
+.title {
+  font-family: var(--display);
+  font-size: clamp(40px, 7vw, 72px);
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+}
+.title em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.sub {
+  font-size: 15px;
+  color: var(--text2);
+  line-height: 1.7;
+  margin: 24px 0 32px;
+  max-width: 440px;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+}
+
+.statNum {
+  font-family: var(--mono);
+  font-size: 30px;
+  font-weight: 500;
+  color: var(--accent2);
+}
+
+.statLabel {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-top: 4px;
+}
+
+.divider {
+  width: 1px;
+  height: 40px;
+  background: var(--border2);
+}
+
+/* Крутящаяся пластинка */
+.recordWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 420px;
+}
+
+.record {
+  position: relative;
+  width: 360px;
+  height: 360px;
+  max-width: 80vw;
+  max-height: 80vw;
+  border-radius: 50%;
+  background: #100d0a;
+  background-image: repeating-radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.04) 0,
+    rgba(255, 255, 255, 0.04) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.6),
+    inset 0 0 60px rgba(0, 0, 0, 0.8);
+  animation: spin 12s linear infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recordLabel {
+  width: 38%;
+  height: 38%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent) 0%, var(--accent-dim) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #1a0d04;
+}
+.recordLabel::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--bg);
+}
+
+.labelTitle {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.labelSub {
+  font-family: var(--mono);
+  font-size: 8px;
+  margin-top: 4px;
+  letter-spacing: 0.1em;
+}
+
+.tonearm {
+  position: absolute;
+  top: 10%;
+  right: 12%;
+  width: 4px;
+  height: 180px;
+  background: linear-gradient(var(--text3), var(--text2));
+  border-radius: 2px;
+  transform-origin: top right;
+  transform: rotate(22deg);
+}
+.tonearm::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: -4px;
+  width: 12px;
+  height: 18px;
+  background: var(--accent2);
+  border-radius: 2px;
+}
+
+@media (max-width: 860px) {
+  .hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding: 48px 20px;
+  }
+  .recordWrap {
+    display: none;
+  }
+}

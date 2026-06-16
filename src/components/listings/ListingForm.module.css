@@ -1,0 +1,51 @@
+.typeToggle {
+  display: flex;
+  gap: 6px;
+}
+
+.typeBtn {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text2);
+  font-family: var(--sans);
+  font-size: 12px;
+  padding: 9px;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.typeActive {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #1a0d04;
+}
+
+.uploadZone {
+  border: 1px dashed var(--border2);
+  border-radius: 6px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.uploadZone:hover {
+  border-color: var(--accent);
+  background: var(--bg);
+}
+
+.uploadPlaceholder {
+  color: var(--text3);
+  font-size: 12px;
+}
+
+.uploadIcon {
+  font-size: 32px;
+  color: var(--accent-dim);
+  margin-bottom: 8px;
+}
+
+.preview {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+}

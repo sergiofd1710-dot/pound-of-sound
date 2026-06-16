@@ -1,0 +1,128 @@
+# Pound of Sound
+
+Маркетплейс виниловых пластинок: покупка, продажа, обмен, торги, сообщество и
+ИИ-оценка. Дизайн — тёплый чёрный винил + оранжевый акцент (вдохновлён лейблом
+Impulse!), шрифты Unbounded / Golos Text / JetBrains Mono.
+
+Это пересборка проекта с нуля: **React + TypeScript + Vite** на фронте,
+**Supabase** на бэке (авторизация, база, хранилище фото, Edge Functions для
+ИИ-оценки).
+
+## Технологии
+
+- **Vite + React + TypeScript** — фронтенд
+- **react-router-dom** — роутинг
+- **@tanstack/react-query** — загрузка/кеш данных поверх Supabase
+- **@supabase/supabase-js** — клиент Supabase (auth, БД, storage, функции)
+- **@fontsource** — self-hosted шрифты (надёжнее CDN из РФ)
+
+## Запуск локально
+
+```bash
+npm install
+cp .env.example .env.local   # затем впишите свои значения (см. ниже)
+npm run dev                  # http://localhost:5173
+```
+
+Прочие команды:
+
+```bash
+npm run build       # продакшн-сборка в dist/
+npm run preview     # предпросмотр собранного
+npm run typecheck   # проверка типов без сборки
+```
+
+## Переменные окружения
+
+`.env.local` (не коммитится) содержит публичные ключи Supabase — их можно
+безопасно отдавать в браузер:
+
+```
+VITE_SUPABASE_URL=https://vqtbevkgjmdxbjjilkzg.supabase.co
+VITE_SUPABASE_ANON_KEY=<anon-ключ из Supabase Dashboard → Project Settings → API>
+```
+
+> **Никогда** не кладите сюда service_role-ключ или ключ ИИ-провайдера — anon-ключ
+> безопасен для фронтенда, остальные секреты живут только в Supabase Secrets
+> (см. ниже про Edge Function).
+
+## Что реализовано (Фаза 1)
+
+- Регистрация и вход (Supabase Auth + таблица `profiles`)
+- Каталог объявлений из таблицы `listings` (с именем продавца)
+- Фильтр по жанрам и «только обмен», поиск по исполнителю/альбому/лейблу
+- Карточка-деталь объявления (характеристики, продавец, действия)
+- Создание объявления с загрузкой фото в бакет `vinyl_images`
+- Счётчики на главной (кол-во пластинок и продавцов)
+
+Кнопки «Купить»/«Предложить обмен» — пока заглушки: реальная безопасная сделка
+(эскроу) появится в Фазе 6.
+
+## Бэкенд Supabase
+
+Используется существующий проект `vqtbevkgjmdxbjjilkzg`:
+
+- таблица `profiles` (id, username)
+- таблица `listings` (user_id, artist, album, year, label, genre, condition,
+  price, type, description, image_url, created_at)
+- storage-бакет `vinyl_images`
+
+> Типы БД в `src/types/database.ts` пока написаны вручную по этой схеме. Когда
+> подключите Supabase CLI (ниже), замените их на автогенерацию:
+>
+> ```bash
+> npx supabase gen types typescript --project-id vqtbevkgjmdxbjjilkzg > src/types/database.ts
+> ```
+
+## ИИ-оценка через Edge Function (Фаза 2 — план)
+
+Ключ ИИ-провайдера **нельзя** держать во фронтенде. Запрос идёт так:
+
+```
+Фронтенд → Supabase Edge Function `appraise` (ключ в Secrets) → API провайдера → ответ
+```
+
+Edge Functions работают на серверах Supabase за пределами РФ — это решает и
+геоблокировку API. Провайдеры, доступные из России: **ProxyAPI** (proxyapi.ru),
+**VseGPT** (vsegpt.ru) — оплата российской картой; **OpenRouter** — дешевле,
+оплата зарубежной картой/криптой. Все они OpenAI-совместимы, поэтому смена
+провайдера = смена переменных окружения, а не кода:
+
+- `AI_API_KEY` — ключ провайдера
+- `AI_BASE_URL` — напр. `https://api.proxyapi.ru/openai/v1`
+- `AI_MODEL` — напр. `gpt-4o-mini`
+
+Код функции (`supabase/functions/appraise/index.ts`) будет добавлен в Фазе 2.
+
+## Supabase CLI — что это и зачем (для миграций и Edge Functions)
+
+**Supabase CLI** — консольная утилита, которая связывает локальный код с вашим
+облачным проектом: применяет SQL-миграции и деплоит Edge Functions. Понадобится
+начиная с Фазы 2 (ИИ-оценка) и далее (торги, клуб, эскроу — там новые таблицы).
+
+Пошагово:
+
+1. **Установка:** `npm install -g supabase` (или вызывать через `npx supabase …`).
+2. **Access token** — персональный ключ доступа к вашему аккаунту Supabase (это
+   НЕ anon-ключ). Берётся в дашборде: аватар → **Account → Access Tokens →
+   Generate new token**. Затем: `supabase login` и вставить токен.
+3. **Привязка проекта:** `supabase link --project-ref vqtbevkgjmdxbjjilkzg`.
+4. **Миграции:** SQL кладётся в `supabase/migrations/`, применяется
+   `supabase db push`.
+5. **Edge Function:** `supabase functions deploy appraise`; секреты —
+   `supabase secrets set AI_API_KEY=… AI_BASE_URL=… AI_MODEL=…`.
+
+**Без CLI** тоже можно: SQL-миграции выполнить вручную в дашборде (SQL Editor),
+функцию задеплоить через интерфейс. Код и SQL будут готовиться так, чтобы оба
+пути работали.
+
+## Дорожная карта
+
+| Фаза | Содержание | Статус |
+|------|------------|--------|
+| 1 | Auth + каталог + создание объявлений | ✅ готово |
+| 2 | ИИ-оценка через Edge Function | план |
+| 3 | Торги/аукционы (таблицы `auctions`/`bids`, таймеры, Realtime) | план |
+| 4 | Клуб/форум (`threads`/`posts`) | план |
+| 5 | Вонтлист, отзывы, страница продавца | план |
+| 6 | Эскроу / безопасная сделка | план |

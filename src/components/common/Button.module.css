@@ -1,0 +1,40 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.outline {
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--text);
+}
+.outline:not(:disabled):hover {
+  border-color: var(--accent);
+  color: var(--accent2);
+}
+
+.fill {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: #1a0d04;
+}
+.fill:not(:disabled):hover {
+  background: var(--accent2);
+  border-color: var(--accent2);
+}

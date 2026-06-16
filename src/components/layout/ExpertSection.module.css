@@ -1,0 +1,88 @@
+.section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+  padding: 80px 48px;
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+}
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-dim);
+  margin-bottom: 20px;
+}
+
+.heading {
+  font-family: var(--display);
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.heading em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.body {
+  font-size: 15px;
+  color: var(--text2);
+  line-height: 1.7;
+  margin: 24px 0;
+  max-width: 420px;
+}
+
+.soon {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent2);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 8px 18px;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.item {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.num {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--accent);
+  padding-top: 2px;
+}
+
+.itemTitle {
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.itemDesc {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .section {
+    grid-template-columns: 1fr;
+    padding: 56px 20px;
+    gap: 36px;
+  }
+}

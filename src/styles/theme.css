@@ -1,0 +1,106 @@
+/* ───────────────────────────────────────────────────────────
+   Pound of Sound — дизайн-токены
+   Чёрный винил + оранжевый акцент (вдохновлён лейблом Impulse!).
+   Шрифты: Unbounded (дисплей) / Golos Text (текст) / JetBrains Mono (цифры).
+   ─────────────────────────────────────────────────────────── */
+
+:root {
+  /* Фоны — тёплый чёрный */
+  --bg:   #0c0a08;
+  --bg2:  #141110;
+  --bg3:  #1c1815;
+  --bg4:  #251f1a;
+
+  /* Оранжевый акцент Impulse! */
+  --accent:     #ff6b1a;
+  --accent2:    #ff8a3d;
+  --accent3:    #ffb27a;
+  --accent-dim: #8a3d12;
+
+  /* Текст */
+  --text:  #f3ece2;
+  --text2: #b7ac9c;
+  --text3: #756c5f;
+
+  /* Границы */
+  --border:  rgba(255, 107, 26, 0.16);
+  --border2: rgba(255, 107, 26, 0.34);
+
+  /* Шрифты */
+  --display: 'Unbounded', system-ui, sans-serif;
+  --sans:    'Golos Text', system-ui, sans-serif;
+  --mono:    'JetBrains Mono', ui-monospace, monospace;
+
+  /* Состояния по Goldmine (бейджи) */
+  --grade-bg: rgba(255, 107, 26, 0.12);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Зернистый оверлей (как у винилового конверта) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent-dim);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
