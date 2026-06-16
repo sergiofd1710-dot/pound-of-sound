@@ -1,0 +1,89 @@
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 56px 48px 80px;
+}
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-dim);
+  margin-bottom: 12px;
+}
+
+.title {
+  font-family: var(--display);
+  font-size: clamp(28px, 4vw, 38px);
+  font-weight: 700;
+}
+
+.lead {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.7;
+  margin: 16px 0 28px;
+}
+
+.addRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.empty {
+  color: var(--text3);
+  font-size: 14px;
+  padding: 20px 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 18px;
+}
+
+.itemTitle {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.status {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 4px;
+}
+.available {
+  color: var(--accent2);
+}
+
+.remove {
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-size: 12px;
+  transition: color 0.2s;
+}
+.remove:hover {
+  color: #ff8a72;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 40px 20px 60px;
+  }
+  .addRow {
+    grid-template-columns: 1fr;
+  }
+}

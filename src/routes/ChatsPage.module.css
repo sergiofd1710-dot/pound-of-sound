@@ -1,0 +1,148 @@
+.page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 48px 48px 80px;
+}
+
+.title {
+  font-family: var(--display);
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.empty {
+  color: var(--text3);
+  font-size: 14px;
+  padding: 40px 0;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 20px;
+  height: 560px;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+}
+
+.convItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: left;
+  transition: border-color 0.2s;
+}
+.convItem:hover {
+  border-color: var(--border2);
+}
+.convActive {
+  border-color: var(--accent);
+}
+
+.convText {
+  min-width: 0;
+}
+
+.convName {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.convSubject {
+  font-size: 11px;
+  color: var(--text3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.chatHead {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.chatSubject {
+  font-weight: 400;
+  color: var(--text3);
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.msg {
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.mine {
+  align-self: flex-end;
+  background: var(--accent);
+  color: #1a0d04;
+  border-bottom-right-radius: 3px;
+}
+
+.theirs {
+  align-self: flex-start;
+  background: var(--bg4);
+  color: var(--text);
+  border-bottom-left-radius: 3px;
+}
+
+.composer {
+  display: flex;
+  gap: 10px;
+  padding: 14px;
+  border-top: 1px solid var(--border);
+}
+.composer input {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 32px 20px 60px;
+  }
+  .layout {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .sidebar {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  .convSubject {
+    display: none;
+  }
+}

@@ -67,6 +67,19 @@
 .links a:hover {
   color: var(--accent2);
 }
+.activeLink {
+  color: var(--accent2) !important;
+}
+
+.icon {
+  font-size: 16px;
+  color: var(--text2);
+  padding: 4px;
+  transition: color 0.2s;
+}
+.icon:hover {
+  color: var(--accent2);
+}
 
 .right {
   display: flex;
@@ -85,6 +98,10 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--accent-dim);
+  transition: color 0.2s;
+}
+.username:hover {
+  color: var(--accent2);
 }
 
 @media (max-width: 768px) {

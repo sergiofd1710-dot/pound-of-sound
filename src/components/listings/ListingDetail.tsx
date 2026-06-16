@@ -1,14 +1,18 @@
+import { useNavigate } from 'react-router-dom';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
+import { Avatar } from '../common/Avatar';
+import { RatingStars } from '../common/RatingStars';
 import { useToast } from '../common/Toast';
-import { useAuth } from '../../contexts/AuthContext';
-import type { ListingWithSeller } from '../../types/database';
+import { useActor, useDemo } from '../../hooks/useDemo';
 import {
-  isExchange,
-  isSell,
-  priceLabel,
-  typeLabel,
-} from '../../lib/listing';
+  addWishlist,
+  createDeal,
+  sellerRating,
+  startConversation,
+} from '../../lib/demoStore';
+import type { ListingWithSeller } from '../../types/database';
+import { isExchange, isSell, priceLabel, typeLabel } from '../../lib/listing';
 import styles from './ListingDetail.module.css';
 
 interface ListingDetailProps {
@@ -22,23 +26,60 @@ export function ListingDetail({
   onClose,
   onRequireAuth,
 }: ListingDetailProps) {
-  const { user } = useAuth();
+  const actor = useActor();
+  const state = useDemo();
   const toast = useToast();
+  const navigate = useNavigate();
 
   if (!r) return null;
 
   const price = priceLabel(r.price);
   const seller = r.profiles?.username ?? 'Пользователь';
-  const initials = seller.slice(0, 2).toUpperCase();
+  const subject = `${r.artist} — ${r.album}`;
+  const rating = sellerRating(state, seller);
 
-  // В Фазе 1 кнопки покупки/обмена — заглушки. Реальный эскроу-флоу — Фаза 6.
-  function handleAction(label: string) {
-    if (!user) {
+  function requireActor(): string | null {
+    if (!actor) {
       onRequireAuth();
       toast('Войдите, чтобы продолжить');
+      return null;
+    }
+    return actor;
+  }
+
+  function buySafe() {
+    const me = requireActor();
+    if (!me) return;
+    if (me === seller) {
+      toast('Это ваше объявление');
       return;
     }
-    toast(`${label} — скоро (безопасная сделка появится позже)`);
+    createDeal(me, seller, subject, r!.price);
+    onClose();
+    toast('Безопасная сделка создана');
+    navigate('/profile');
+  }
+
+  function message(text: string) {
+    const me = requireActor();
+    if (!me) return;
+    if (me === seller) {
+      toast('Это ваше объявление');
+      return;
+    }
+    startConversation(me, seller, subject, text);
+    onClose();
+    navigate('/chats');
+  }
+
+  function wish() {
+    const me = requireActor();
+    if (!me) return;
+    addWishlist(me, r!.artist, r!.album, [
+      ...state.auctions.map((a) => ({ artist: a.artist, album: a.album })),
+      { artist: r!.artist, album: r!.album },
+    ]);
+    toast('Добавлено в вонтлист');
   }
 
   const specs: [string, string][] = [
@@ -91,27 +132,52 @@ export function ListingDetail({
 
           <div className={styles.actions}>
             {isSell(r.type) && (
-              <Button
-                variant="fill"
-                onClick={() => handleAction(`Купить за ${price}`)}
-              >
-                Купить за {price}
+              <Button variant="fill" onClick={buySafe}>
+                Купить — безопасная сделка
               </Button>
             )}
             {isExchange(r.type) && (
-              <Button onClick={() => handleAction('Предложить обмен')}>
+              <Button
+                onClick={() =>
+                  message(`Здравствуйте! Интересует обмен на «${subject}».`)
+                }
+              >
                 Предложить обмен
               </Button>
             )}
+            <Button
+              onClick={() =>
+                message(`Здравствуйте! Ещё актуально «${subject}»?`)
+              }
+            >
+              Написать продавцу
+            </Button>
+            <button className={styles.wishBtn} onClick={wish}>
+              ♡ В вонтлист
+            </button>
           </div>
 
-          <div className={styles.seller}>
-            <div className={styles.avatar}>{initials}</div>
+          <button
+            className={styles.seller}
+            onClick={() => {
+              onClose();
+              navigate(`/seller/${seller}`);
+            }}
+          >
+            <Avatar name={seller} size={42} />
             <div>
               <div className={styles.sellerName}>{seller}</div>
-              <div className={styles.sellerMeta}>Продавец</div>
+              <div className={styles.sellerMeta}>
+                {rating.count ? (
+                  <span className={styles.sellerRating}>
+                    <RatingStars value={rating.avg} size={12} /> {rating.avg}
+                  </span>
+                ) : (
+                  'Продавец'
+                )}
+              </div>
             </div>
-          </div>
+          </button>
         </div>
       </div>
     </Modal>

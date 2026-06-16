@@ -122,37 +122,59 @@
   gap: 10px;
   margin-bottom: 24px;
   flex-wrap: wrap;
+  align-items: center;
+}
+
+.wishBtn {
+  background: none;
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  color: var(--text2);
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 10px 16px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.wishBtn:hover {
+  color: var(--accent2);
+  border-color: var(--accent);
 }
 
 .seller {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding-top: 20px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
   border-top: 1px solid var(--border);
-}
-
-.avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: var(--accent-dim);
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--mono);
-  font-size: 14px;
+  padding-top: 20px;
+  cursor: pointer;
 }
 
 .sellerName {
   font-size: 14px;
   font-weight: 500;
+  color: var(--text);
+  transition: color 0.2s;
+}
+.seller:hover .sellerName {
+  color: var(--accent2);
 }
 
 .sellerMeta {
   font-size: 11px;
   color: var(--text3);
+  margin-top: 2px;
+}
+
+.sellerRating {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 @media (max-width: 680px) {

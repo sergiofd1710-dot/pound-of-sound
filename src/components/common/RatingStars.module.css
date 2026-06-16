@@ -1,0 +1,25 @@
+.stars {
+  display: inline-flex;
+  gap: 2px;
+  line-height: 1;
+}
+
+.star {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--bg4);
+  line-height: 1;
+}
+
+.filled {
+  color: var(--accent);
+}
+
+.interactive {
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.interactive:hover {
+  transform: scale(1.15);
+}
